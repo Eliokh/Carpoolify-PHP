@@ -1,71 +1,70 @@
 <?php
-// start the session
-session_start();
-
-if(isset($_POST['username'])&&isset($_POST['email'])&&isset($_POST['pass']))
-{
-    // include config and function files
-    require_once "config.php";
+    session_start();
+    
+    require_once "conn.php";
     require_once "domain_exists.php";
 
-    // get the inputed datas
-    $name = $_POST['username'];
-    $fName = $_POST['firstName'];
-    $lName = $_POST['lastName'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $password = $_POST['pass'];
-    $retypePassword = $_POST['repass'];
-    $p = md5($password);
+    if(isset($_POST['firstName']) && isset($_POST['lastName']) && isset($_POST['username']) && isset($_POST['email']) && isset($_POST['pass']) && isset($_POST['phone'])) {
 
-    // basic email format check
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION['error'] = "Invalid email format";
-        header("location: signup.html");
-        exit;
-    }
-    elseif(!domain_exists($email)) // domain check
-    {
-        $_SESSION['error'] = "Invalid email domain";
-        header("location: signup.html");
-        exit;
-    }
-    else // check if email was already created
-    {
         $stmt = mysqli_stmt_init($conn);
-        if (mysqli_stmt_prepare($stmt,"SELECT * FROM users WHERE userEmail=?")) { // sql injection protection
-            // Bind parameters
-            mysqli_stmt_bind_param($stmt,"s", $email);
-            // Execute query
-            mysqli_stmt_execute($stmt);
-            // Bind result variables
-            $result = mysqli_stmt_get_result($stmt);
-            // Close statement
-            mysqli_stmt_close($stmt);
-        }
 
-        if ($result->num_rows > 0) { // email already registered
-            $_SESSION['error'] = "Email already registered";
-            header("location: signup.html");
-            exit;
+        // get the inputted data
+        $fName = $_POST['firstName'];
+        $lName = $_POST['lastName'];
+        $name = $_POST['username'];
+        $email = $_POST['email'];
+        $phone = $_POST['phone'];
+        $password = $_POST['pass'];
+        $p = md5($password);
+
+        // basic email format check
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = "not_valid";
         }
-        else { // email not registered
-            $stmt2 = mysqli_stmt_init($conn); // init
-            if(mysqli_stmt_prepare($stmt2,"INSERT INTO users (userFirstName,userLastName,userName,userEmail,userPassword,userPhone) 
-            VALUES (?,?,?,?,?,?)")) { // insert query prepare
-                mysqli_stmt_bind_param($stmt2,"ssssss",$fName,$lName,$name, $email,$p,$phone); // bind variables
-                mysqli_stmt_execute($stmt2);
-                // check if the query was successful
-                if(mysqli_stmt_affected_rows($stmt2) > 0){
-                    $_SESSION['success'] = "User created successfully";
-                    header("location: login.html"); 
-                } else {
-                    $_SESSION['error'] = "User creation failed";
-                    header("location: signup.html"); 
+        elseif(!domain_exists($email)) // domain check
+        {
+            $_SESSION['error'] = "not_valid";
+        }
+        else // check if email was already created
+        {
+            if (mysqli_stmt_prepare($stmt,"SELECT * FROM users WHERE userEmail=?")) { // sql injection protection
+                // bind parameters
+                mysqli_stmt_bind_param($stmt,"s", $email);
+                // execute query
+                mysqli_stmt_execute($stmt);
+                // bind result variables
+                $result = mysqli_stmt_get_result($stmt);
+                // close statement
+                $stmt->close();
+            }
+
+            if ($result->num_rows > 0) {
+                $_SESSION['error'] = "User_exists";
+            }
+            else {
+                $stmt2 = mysqli_stmt_init($conn);//init
+                if(mysqli_stmt_prepare($stmt2,"INSERT INTO users (userFirstName,userLastName,userName,userEmail,userPassword,userPhone) 
+                VALUES (?,?,?,?,?,?)"))//insert query prepare
+                {
+                    mysqli_stmt_bind_param($stmt2,"ssssss",$fName,$lName,$name, $email,$p,$phone); //bind variables
+                    $stmt2->execute();
+                    $result = mysqli_stmt_get_result($stmt2);
+                
+                    //check if the query was successful
+                    if(mysqli_stmt_affected_rows($stmt2) > 0) {
+                        $_SESSION['success'] = "Account created successfully";
+                        header("location: login.html");//redirect to the login page
+                        exit();
+                    } else {
+                        $_SESSION['error'] = "Account creation failed";
+                        header("Location: signup.html?stat=failure");
+                    }
+                    // close statement
+                    $stmt2->close();
                 }
-                mysqli_stmt_close($stmt2);
             }
         }
+        header("location: signup.html?stat=failure");//redirect to the signup page
+        exit();
     }
-}
 ?>

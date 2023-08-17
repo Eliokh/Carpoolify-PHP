@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
+    <link rel="icon" type="image/png" href="/assets/img/carpoolify white.ico" />
 
     <!-- Google Fonts -->
     <link
@@ -70,7 +70,6 @@
 
     <link rel="stylesheet" type="text/css" href="css/util.css" />
     <link rel="stylesheet" type="text/css" href="css/main.css" />
-
 
     <!-----this is not a mandatory code(the jquery one), Karim added it because he love to work in a professional way. 
       In the next lines I will explain why he used it here and what is the purpose of using it:
@@ -146,13 +145,8 @@
         })(w, d, "zarazData", "script");
       })(window, document);
     </script>
+  </head>
 
-
- </head>
-
-
-
- 
   <body>
     <div class="limiter">
       <div
@@ -160,8 +154,14 @@
         style="background-image: url('../assets/img/hero-bg.jpg')"
       >
         <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
-          <form class="login100-form validate-form" action="login.php" method="POST">
+          <form
+            class="login100-form validate-form"
+            action="login.php"
+            method="POST"
+          >
             <span class="login100-form-title p-b-49"> Login </span>
+
+            <p id="validationMsg" class="invalid-login-msg">Invalid Login</p>
 
             <div class="row">
               <div
@@ -195,21 +195,21 @@
             <div class="container-login100-form-btn p-t-40 p-b-30">
               <div class="wrap-login100-form-btn">
                 <div class="login100-form-bgbtn"></div>
-                <button class="login100-form-btn" type="submit" >Login</button>
+                <button class="login100-form-btn" type="submit">Login</button>
               </div>
             </div>
 
             <div class="flex-col-c">
-              <a href="signup.html" class="txt2"> Don't have an account! Sign Up Here.</a>
+              <a href="signup.html" class="txt2">
+                Don't have an account! Sign Up Here.</a
+              >
             </div>
           </form>
         </div>
       </div>
 
-
-
       <!-- GO BACK HOME BUTTON -->
-      <a href="../index.html">
+      <a href="../index.php">
         <div id="home_btn">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -264,5 +264,19 @@
       data-cf-beacon='{"rayId":"79a7eec20dcf0d8a","token":"cd0b4b3a733644fc843ef0b185f98241","version":"2023.2.0","si":100}'
       crossorigin="anonymous"
     ></script>
+
+    <script>
+      // Create urlParams query string
+      var urlParams = new URLSearchParams(window.location.search);
+
+      // Get value of single parameter
+      var statURL = urlParams.get("stat");
+
+      validationMsg = document.getElementById("validationMsg");
+
+      if (statURL == "failure") {
+        validationMsg.style.display = "block";
+      }
+    </script>
   </body>
 </html>

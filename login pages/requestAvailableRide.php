@@ -1,50 +1,93 @@
 <?php
-require_once "config.php";
-if(isset($_POST["id"]) && isset($_POST["name"]) && isset($_POST["date"]) && isset($_POST["src"]) && isset($_POST["dest"])){
 
-    $id = $_POST["id"];
-    $name = $_POST["name"];
-    $date = $_POST["date"];
-    $source = $_POST["src"];
-    $destination = $_POST["dest"];
-    
-     $stmt = mysqli_stmt_init($conn);
-    if (mysqli_stmt_prepare($stmt, "INSERT INTO requestride (requestDetails, nbPassengers, passengerID, rideID, statusID, status) VALUES (?, ?, ?, ?, '7', '')")) {
-        // Bind parameters
-        mysqli_stmt_bind_param($stmt, "ssss", $details, $number_of_passengers, $user_id, $ride_id);
+// First, make sure the user is logged in
+session_start();
+if (!isset($_SESSION['userID'])) {
+    header("Location: login.php");
+    exit();
+} else {
+  $userID = $_SESSION['userID'];
+}
+
+
+//echo "<script>alert(" . $_POST['details'] . ")</script>";
+
+require_once "conn.php";
+//if(isset($_POST["id"]) && isset($_POST["name"]) && isset($_POST["date"]) && isset($_POST["src"]) && isset($_POST["dest"])){
+  if(isset($_POST["rideID"]) && isset($_POST["nbPassengers"]) && isset($_POST["details"])){
+    //$id = $_POST["id"];
+    $rideID = $_POST["rideID"];
+    $nbPassengers = $_POST["nbPassengers"];
+    $details = $_POST["details"];
+
+    $stmt = mysqli_stmt_init($conn);
+    if (mysqli_stmt_prepare($stmt, "INSERT INTO requestride (requestDetails, nbPassengers, passengerID, rideID, statusID) VALUES (?, ?, ?, ?, (SELECT statusID FROM statuses WHERE statusName = 'Pending'))")) {
+    //if ($stmt = mysqli_prepare($conn, "INSERT INTO requestride (requestDetails, nbPassengers, passengerID, rideID, statusID) VALUES (?, ?, ?, ?, (SELECT statusID FROM statuses WHERE statusName = 'Pending'), '')")) {
+  
+      //echo $userID;
+      // Bind parameters
+        mysqli_stmt_bind_param($stmt, "ssss", $details, $nbPassengers, $userID, $rideID);
         
-        $details = $source . ' to ' . $destination . ' on ' . $date;
-        $number_of_passengers = 1; // assuming the user is requesting only for themselves
-        $user_id = 1; // assuming the user ID is always 1
-        $ride_id = $id;
+        //$details = $source . ' to ' . $destination . ' on ' . $date;
+        //$number_of_passengers = 1; // assuming the user is requesting only for themselves
+        //$user_id = 1; // assuming the user ID is always 1
+        //$ride_id = $id;
         
         // Execute query
         mysqli_stmt_execute($stmt);
         // Bind result variables
-        mysqli_stmt_bind_result($stmt, $details, $number_of_passengers, $user_id, $ride_id);
-        mysqli_stmt_fetch($stmt); // fetch only one row
+        //mysqli_stmt_bind_result($stmt, $details, $number_of_passengers, $user_id, $ride_id, $status_id);
+        //mysqli_stmt_fetch($stmt); // fetch only one row
         
         // store the data in an array
-        $result = array();
-        $result['id'] = $id;
-        $result['name'] = $name;
-        $result['date'] = $date;
-        $result['src'] = $source;
-        $result['dest'] = $destination;
+        //$result = array();
+        //$result['id'] = $id;
+        //$result['name'] = $name;
+        //$result['date'] = $date;
+        //$result['src'] = $source;
+        //$result['dest'] = $destination;
         
         // Check if a row was affected
         if (mysqli_stmt_affected_rows($stmt) > 0) {
-            echo "success";
+            //echo "success";
         } else {
-            echo "failure";
+            //echo "failure";
+            header("Location: searchRide.php");
         }
         
         // Close statement
         mysqli_stmt_close($stmt);
     } else {
-        echo "failure";
+        //echo "failure";
+        header("Location: searchRide.php");
     }
 }
+
+
+// Fetch user information from the database
+// $user_id = $_SESSION['userID'];
+// $sql = "SELECT * FROM users WHERE userID = $user_id";
+// $result = mysqli_query($conn, $sql);
+// $user = mysqli_fetch_assoc($result);
+
+// Query the database for all rides requested by the user
+//$sql = "SELECT * FROM requestride re, rides ri WHERE re.passengerID = $userID AND re.rideID = ri.rideID";
+$sql = "SELECT 
+CONCAT(users.userFirstName, ' ', users.userLastName) AS driverName, 
+rides.startDate AS startDatetime,
+source.locationName AS sourceLocation,
+destination.locationName AS destinationLocation,
+statuses.statusName AS rideStatus
+FROM 
+rides
+INNER JOIN users ON rides.driverID = users.userID
+INNER JOIN locations AS source ON rides.sourceID = source.locationID
+INNER JOIN locations AS destination ON rides.destinationID = destination.locationID
+INNER JOIN statuses ON rides.statusID = statuses.statusID
+INNER JOIN requestride ON rides.rideID = requestride.rideID
+WHERE 
+requestride.passengerID = " . $userID;
+$result = mysqli_query($conn, $sql);
 ?> 
 
 <!DOCTYPE html>
@@ -147,25 +190,17 @@ if(isset($_POST["id"]) && isset($_POST["name"]) && isset($_POST["date"]) && isse
             </tr>
           </thead>
           <tbody>
-          <tr>
-                <td><?php echo $result['name']; ?></td>
-                <td><?php echo $result['date']; ?></td>
-                <td><?php echo $result['src'];  ?></td>
-                <td><?php echo $result['dest']; ?></td>
-          <td>
-                <?php
-                  // Replace with PHP code that checks request status
-                  $status = "Pending";
-    
-                  if ($status == "Pending") {
-                    echo '<button class="btn btn-warning" onclick="cancelRequest()">Pending</button>';
-                  } else {
-                    echo '<button class="btn btn-success">Accepted</button>';
-                  }
-                ?>
-              </td>
-            </tr>
-
+          <?php
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<tr>";
+                echo "<td>" . $row['driverName'] . "</td>";
+                echo "<td>" . $row['startDatetime'] . "</td>";
+                echo "<td>" . $row['sourceLocation'] . "</td>";
+                echo "<td>" . $row['destinationLocation'] . "</td>";
+                echo "<td>" . $row['rideStatus'] . "</td>";
+                echo "</tr>";
+            }
+            ?>
           </tbody>
         </table>
       </div>

@@ -1,7 +1,24 @@
+<?php
+session_start();
 
+// Check if user is not logged in
+if (!isset($_SESSION['userID']) || ($_SESSION['userID'] == '')) {
+    header("Location: ./login pages/login.html");
+    exit();
+} 
 
-
-
+// Karim
+if (isset($_GET['postride'])){
+  if ($_GET['postride'] == "success"){
+    echo "<script>alert('Ride was posted successfully');</script>";
+  }
+  else
+  {
+    echo "<script>alert('Something went wrong');</script>";
+  }
+}
+// end
+?>
 
 <!DOCTYPE html>
 
@@ -14,8 +31,10 @@
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
+    <link rel="icon" type="image/png" href="/Uni-project/assets/img/carpoolify white.ico" />
+
     <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon" />
+    <!-- <link href="assets/img/favicon.png" rel="icon" /> -->
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
     <!-- all links added manually -->
 
@@ -63,6 +82,8 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
    -->
+   <link rel="shortcut icon" type="image/x-icon" href="/Uni-project/assets/img/carpoolify white.ico">
+
   </head>
 
   <body>
@@ -82,7 +103,7 @@
           <i
             class="bi bi-envelope d-flex align-items-center"
             style="margin-right: 50px"
-            ><a href="mailto:karim.yazbeck@st.ul.edu.lb"
+            ><a href="mailto:karim.yazbek@st.ul.edu.lb"
               >karim.yazbek@st.ul.edu.lb</a
             ></i
           >
@@ -124,7 +145,7 @@
         <div class="header-cta">
           <a href="login pages/login.html" class="btn btn-outline-primary">Login</a>
           <a href="login pages/signup.html" class="btn btn-primary">Sign Up</a>
-          <a href="login pages/login.html" onclick="return confirm('Are you sure you want to log out?');" class="btn btn-outline-primary">Logout</a>
+          <a href="login pages/logout.php" onclick="return confirm('Are you sure you want to log out?');" class="btn btn-outline-primary">Logout</a>
 
         </div>
       </div>
@@ -140,13 +161,24 @@
           destination.
         </h2>
         <div class="d-flex">
-          <a href="#about" class="btn-get-started scrollto"> Publish a ride </a>
+
+        <div class="row justify-content-center my-4">
+  <div class="col-md-6 col-lg-4 col-sm-12 mb-3 mb-md-0">
+    <a href="./login pages/myReviews.php" class="btn btn-primary btn-lg btn-block">My Reviews</a>
+  </div>
+  <div class="col-md-6 col-lg-4 col-sm-12">
+    <a href="#ride" class="btn btn-primary btn-lg btn-block">Publish a ride</a>
+  </div>
+</div>
+
+
 
           <a
             href="https://youtu.be/61FtkopDfjc"
             class="glightbox btn-watch-video"
             ><i class="bi bi-play-circle"></i><span>Watch Video</span></a
           >
+
         </div>
 
         <!-- SEARCH BAR -->
@@ -156,7 +188,7 @@
           <input
             class="col-lg-3 col-6 source-location-select"
             type="text"
-            name="sourceLocation"
+            name="src"
             placeholder="Pick-up Location"
             spellcheck="false"
             required
@@ -164,7 +196,7 @@
           <input
             class="col-lg-3 col-6 destination-select"
             type="text"
-            name="destinationLocation"
+            name="dest"
             placeholder="Destination"
             spellcheck="false"
             required
@@ -192,7 +224,7 @@
           />
         </div>
 
-        <ul class="search-list search-list-source">
+        <!-- <ul class="search-list search-list-source">
           <li data-name="beirut">Beirut</li>
           <li data-name="jdeideh">Jdeideh</li>
           <li data-name="tripoli">Tripoli</li>
@@ -207,23 +239,14 @@
           <li data-name="dora">Dora</li>
           <li data-name="dekwaneh">Dekwaneh</li>
           <li data-name="lebanese university">Lebanese University</li>
+        </ul> -->
+
+        <ul class="search-list search-list-source">
+        <?php include 'locationList.php'; ?>
         </ul>
 
         <ul class="search-list search-list-destination">
-          <li data-name="beirut">Beirut</li>
-          <li data-name="jdeideh">Jdeideh</li>
-          <li data-name="tripoli">Tripoli</li>
-          <li data-name="saida">Saida</li>
-          <li data-name="fanar">Fanar</li>
-          <li data-name="zalka">Zalka</li>
-          <li data-name="burj hammoud">Burj Hammoud</li>
-          <li data-name="zouk">Zouk</li>
-          <li data-name="jounieh">Jounieh</li>
-          <li data-name="dbayeh">Dbayeh</li>
-          <li data-name="byblos">Byblos</li>
-          <li data-name="dora">Dora</li>
-          <li data-name="dekwaneh">Dekwaneh</li>
-          <li data-name="lebanese university">Lebanese University</li>
+        <?php include 'locationList.php'; ?>
         </ul>
         </div>
 </form>
@@ -674,7 +697,7 @@
   <input
     class="col-lg-3 col-6 source-location-select"
     type="text"
-    name="sourceLocation"
+    name="src"
     placeholder="Pick-up Location"
     spellcheck="false"
     required
@@ -682,7 +705,7 @@
   <input
     class="col-lg-3 col-6 destination-select"
     type="text"
-    name="destinationLocation"
+    name="dest"
     placeholder="Destination"
     spellcheck="false"
     required
@@ -710,37 +733,11 @@
 </div>
 
 <ul class="search-list search-list-source">
-  <li data-name="beirut">Beirut</li>
-  <li data-name="jdeideh">Jdeideh</li>
-  <li data-name="tripoli">Tripoli</li>
-  <li data-name="saida">Saida</li>
-  <li data-name="fanar">Fanar</li>
-  <li data-name="zalka">Zalka</li>
-  <li data-name="burj hammoud">Burj Hammoud</li>
-  <li data-name="zouk">Zouk</li>
-  <li data-name="jounieh">Jounieh</li>
-  <li data-name="dbayeh">Dbayeh</li>
-  <li data-name="byblos">Byblos</li>
-  <li data-name="dora">Dora</li>
-  <li data-name="dekwaneh">Dekwaneh</li>
-  <li data-name="lebanese university">Lebanese University</li>
+<?php include 'locationList.php'; ?>
 </ul>
 
 <ul class="search-list search-list-destination">
-  <li data-name="beirut">Beirut</li>
-  <li data-name="jdeideh">Jdeideh</li>
-  <li data-name="tripoli">Tripoli</li>
-  <li data-name="saida">Saida</li>
-  <li data-name="fanar">Fanar</li>
-  <li data-name="zalka">Zalka</li>
-  <li data-name="burj hammoud">Burj Hammoud</li>
-  <li data-name="zouk">Zouk</li>
-  <li data-name="jounieh">Jounieh</li>
-  <li data-name="dbayeh">Dbayeh</li>
-  <li data-name="byblos">Byblos</li>
-  <li data-name="dora">Dora</li>
-  <li data-name="dekwaneh">Dekwaneh</li>
-  <li data-name="lebanese university">Lebanese University</li>
+<?php include 'locationList.php'; ?>
 </ul>
 </div>
 </form>
@@ -766,38 +763,39 @@
             </p>
           </div>
 
+          <form action="./login pages/postRide.php" method="post">
+  <div class="form-group">
+    <label for="source">Source</label>
+    <input type="text" class="form-control" id="source" name="source" required>
+  </div>
+  <div class="form-group">
+    <label for="destination">Destination</label>
+    <input type="text" class="form-control" id="destination" name="destination" required>
+  </div>
+  <div class="form-group">
+    <label for="date">Date</label>
+    <input type="date" class="form-control" id="date" name="date" required>
+  </div>
+  <div class="form-group">
+    <label for="time">Time</label>
+    <input type="time" class="form-control" id="time" name="time" required>
+  </div>
+  <div class="form-group">
+    <label for="seats">Available seats</label>
+    <input type="number" class="form-control" id="seats" name="seats" min="1" max="10" required>
+  </div>
+  <div class="form-group">
+    <label for="notes">Notes (optional)</label>
+    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+  </div>
+  <input type="hidden" name="userId" value="<?php echo $_SESSION['userID']; ?>">
+  <div class="form-group mt-3">
+    <button type="submit" class="btn btn-outline-primary btn-lg btn-block" name="submit">Post Ride</button>
+  </div>
+</form>
 
-        <form action="./login pages/postRide.php" method="post">
-          <div class="form-group">
-            <label for="source">Source</label>
-            <input type="text" class="form-control" id="source" name="source" required>
-          </div>
-          <div class="form-group">
-            <label for="destination">Destination</label>
-            <input type="text" class="form-control" id="destination" name="destination" required>
-          </div>
-          <div class="form-group">
-            <label for="date">Date</label>
-            <input type="date" class="form-control" id="date" name="date" required>
-          </div>
-          <div class="form-group">
-            <label for="time">Time</label>
-            <input type="time" class="form-control" id="time" name="time" required>
-          </div>
-          <div class="form-group">
-            <label for="seats">Available seats</label>
-            <input type="number" class="form-control" id="seats" name="seats" min="1" max="10" required>
-          </div>
-       
-          <div class="form-group">
-  <label for="notes">Notes (optional)</label>
-  <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
-</div>
-<div class="form-group mt-3">
-  <button type="submit" class="btn btn-outline-primary btn-lg btn-block">Post Ride</button>
-</div>
 
-        </form>
+
   
         
         </div>
@@ -1043,13 +1041,10 @@
           &copy; it took us a long <strong><span>TIME</span></strong
           >. to complete it.
         </div>
-        <div class="credits">
-          <!-- All the links in the footer should remain intact. -->
-          <!-- You can delete the links only if you purchased the pro version. -->
-          <!-- Licensing information: https://bootstrapmade.com/license/ -->
-          <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/bizland-bootstrap-business-template/ -->
-          Designed by <a href="">Our 3 Team leaders</a>
-        </div>
+        <div class="credits bg-light p-1">
+    Check this link to see All your RIDES <a href="./login pages/displayRides.php">All My Rides</a>
+</div>
+
       </div>
     </footer>
     <!-- End Footer -->

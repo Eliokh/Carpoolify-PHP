@@ -1,11 +1,11 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>Carpoolify</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
+    <link rel="icon" type="image/png" href="/assets/img/carpoolify white.ico" />
 
     <!-- Google Fonts -->
     <link
@@ -139,9 +139,6 @@
     </script>
   </head>
 
-
-
-
   <body>
     <div class="limiter">
       <div
@@ -149,8 +146,20 @@
         style="background-image: url('../assets/img/hero-bg.jpg')"
       >
         <div class="wrap-signup100 p-l-55 p-r-55 p-t-65 p-b-54">
-          <form class="login100-form validate-form" action="signup.php" method="POST">
-            <span class="login100-form-title p-b-49"> Sign Up </span>
+          <form
+            class="login100-form validate-form"
+            action="signup.php"
+            method="POST"
+          >
+            <span class="login100-form-title p-b-29"> Sign Up </span>
+
+            <p
+              style="margin-bottom: 20px"
+              id="validationMsg"
+              class="invalid-login-msg"
+            >
+              Invalid Signup
+            </p>
 
             <!-- First Name -->
             <div class="row">
@@ -253,25 +262,6 @@
                   />
                 </div>
               </div>
-       <!-- rePassword -->
-       <div class="row">
-        <div class="col-md-6 col-sm-12">
-          <div
-            class="wrap-input50 validate-input m-b-23"
-            data-validate="Password is required"
-          >
-            <span class="label-input100">Confirm Password</span>
-            <input
-              class="input100"
-              type="password"
-              name="repass"
-              placeholder="Enter Your Password Again"
-              required
-            />
-          </div>
-        </div>
-             
-
             </div>
 
             <div class="container-login100-form-btn p-t-40 p-b-30">
@@ -289,7 +279,7 @@
       </div>
 
       <!-- GO BACK HOME BUTTON -->
-      <a href="../index.html">
+      <a href="../index.php">
         <div id="home_btn">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -344,5 +334,19 @@
       data-cf-beacon='{"rayId":"79a7eec20dcf0d8a","token":"cd0b4b3a733644fc843ef0b185f98241","version":"2023.2.0","si":100}'
       crossorigin="anonymous"
     ></script>
+
+    <script>
+      // Create urlParams query string
+      var urlParams = new URLSearchParams(window.location.search);
+
+      // Get value of single parameter
+      var statURL = urlParams.get("stat");
+
+      validationMsg = document.getElementById("validationMsg");
+
+      if (statURL == "failure") {
+        validationMsg.style.display = "block";
+      }
+    </script>
   </body>
 </html>

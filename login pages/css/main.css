@@ -199,6 +199,12 @@ iframe {
   margin: 0 auto;
 }
 
+.invalid-login-msg {
+  color: red;
+  text-align: center;
+  display: none;
+}
+
 .container-login100 {
   width: 100%;
   min-height: 100vh;
@@ -481,7 +487,3 @@ iframe {
     padding-right: 15px;
   }
 }
-
-
-
-

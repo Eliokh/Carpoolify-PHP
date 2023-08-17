@@ -1,7 +1,7 @@
 <?php
 
 $servername = "localhost";
-$username = "elio";
+$username = "root";
 $password = "";
 $dbname = "gitmidproject";
 
